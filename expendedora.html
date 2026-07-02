@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Máquina Expendedora (MEF) — Sistema de Optimización de Redes</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="tema-expendedora">
+  <div class="envoltorio-pagina">
+  <main class="pagina-expendedora">
+    <header class="cabecera-expendedora">
+      <div>
+        <span class="insignia-modulo">Autómata finito · MEF</span>
+        <h1>Simulador de Máquina Expendedora</h1>
+        <p>Modelado formal de estados, transiciones, función de salida λ y cálculo de vuelto óptimo.</p>
+      </div>
+      <a class="enlace-nav" href="index.html">Panel principal</a>
+    </header>
+
+    <section class="escenario-maquina">
+      <div class="expendedora-digital">
+        <div class="marca-maquina">
+          <span>MONCHI BAZAR · MEF</span>
+          <strong>Alfabeto Σ = {0.10, 0.20, 0.50, 1, 2, 5} (S/)</strong>
+        </div>
+
+        <div class="frente-maquina">
+          <aside class="consola-maquina">
+            <div class="pantalla-maquina">
+              <span>Saldo acumulado</span>
+              <strong id="saldoPantalla">0</strong>
+              <small id="mensajePantalla">Inserte monedas para habilitar estados de aceptación.</small>
+            </div>
+
+            <div class="panel-consola">
+              <h2>Entrada de símbolos</h2>
+              <div class="visual-moneda" aria-hidden="true">
+                <div class="ranura-moneda"></div>
+                <div class="moneda-insertada" id="monedaAnimada">S/</div>
+              </div>
+              <div id="botonesMonedas" class="rejilla-monedas"></div>
+              <div class="estado-maquina" id="estadoActual">Estado actual: q0</div>
+            </div>
+
+            <div class="slots-maquina">
+              <div>
+                <span>Entrada σ</span>
+                <strong id="ultimaEntrada">—</strong>
+              </div>
+              <div>
+                <span>Producto λ</span>
+                <strong id="salidaProducto">No</strong>
+              </div>
+              <div>
+                <span>Vuelto</span>
+                <strong id="salidaVuelto">0</strong>
+              </div>
+            </div>
+
+            <div class="salida-producto">
+              <span>Bahía de salida</span>
+              <div class="display-salida">
+                <div class="lata-producto" id="productoVisual">
+                  <span id="productoEtiqueta">Sin producto</span>
+                </div>
+                <div class="bandeja-monedas" id="bandejaVuelto" aria-live="polite">
+                  <span class="sin-vuelto">Vuelto aquí</span>
+                </div>
+              </div>
+              <button class="btn-recoger" id="recogerProducto" type="button" disabled>Recoger producto</button>
+            </div>
+
+            <details class="ajustes-maquina">
+              <summary>Configuración del alfabeto</summary>
+              <label for="monedas">Símbolos de entrada</label>
+              <input id="monedas" type="text" value="0.10,0.20,0.50,1,2,5" placeholder="Ejemplo: 0.10,0.20,0.50,1,2,5">
+              <button class="btn-principal" id="actualizarMaquina" type="button">Actualizar</button>
+              <button class="btn-peligro" id="reiniciarMaquina" type="button">Reiniciar</button>
+            </details>
+          </aside>
+
+          <section class="vitrina-productos" aria-label="Productos disponibles">
+            <div class="cabecera-vitrina">
+              <span>Catálogo de productos</span>
+              <strong>Seleccione producto al alcanzar estado de aceptación</strong>
+            </div>
+            <div class="rejilla-productos" id="listaProductos"></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="explicacion-expendedora">
+      <span>Modelo computacional</span>
+      <h2>Secuencia de operación del autómata</h2>
+      <p>
+        La máquina expendedora se modela como una MEF M = (Q, Σ, δ, q₀, F) donde Q representa estados
+        de saldo acumulado en centavos, Σ es el alfabeto de monedas peruanas, y δ define las transiciones
+        por inserción de símbolos. Cuando el saldo alcanza el precio de un producto, el estado correspondiente
+        se convierte en estado de aceptación. La función de salida λ entrega el producto y calcula el vuelto;
+        la operación concluye al recoger el producto y retornar a q₀.
+      </p>
+    </section>
+
+    <section class="seccion-mef-resumen">
+      <header>
+        <div>
+          <span>Arquitectura del modelo</span>
+          <h2>Tres autómatas finitos interconectados</h2>
+        </div>
+        <p>La MEF principal coordina el flujo; la MEF de dinero calcula el saldo y la MEF de recojo confirma la entrega.</p>
+      </header>
+      <div class="rejilla-mef">
+        <article class="tarjeta-mef">
+          <div class="cabecera-mef">
+            <span>MEF 1</span>
+            <h3>Control general de la expendedora</h3>
+          </div>
+          <canvas id="diagramaMaquina"></canvas>
+        </article>
+        <article class="tarjeta-mef">
+          <div class="cabecera-mef">
+            <span>MEF 2</span>
+            <h3>Control del saldo acumulado</h3>
+          </div>
+          <canvas id="diagramaEstados"></canvas>
+        </article>
+        <article class="tarjeta-mef">
+          <div class="cabecera-mef">
+            <span>MEF 3</span>
+            <h3>Control del retiro del producto</h3>
+          </div>
+          <canvas id="diagramaRecojo"></canvas>
+        </article>
+      </div>
+    </section>
+
+    <section class="seccion-diagrama-estados">
+      <header>
+        <div>
+          <span>Interpretación del modelo</span>
+          <h2>Interconexión de los tres autómatas</h2>
+        </div>
+        <p>La MEF 1 dirige el flujo operacional; la MEF 2 computa δ(q, σ) para el saldo y la MEF 3 valida la recolección.</p>
+      </header>
+      <div class="rejilla-explicacion-mef">
+        <div>
+          <strong>MEF 1 — Flujo operacional</strong>
+          <p>Espera entrada, activa control de saldo, habilita productos, ejecuta λ y reinicia el autómata.</p>
+        </div>
+        <div>
+          <strong>MEF 2 — Cálculo de saldo</strong>
+          <p>Cada símbolo σ ∈ Σ transita el estado interno. Ejemplo: q₃₅₀ representa S/3.50 como estado de aceptación.</p>
+        </div>
+        <div>
+          <strong>MEF 3 — Confirmación de recojo</strong>
+          <p>Tras la entrega del producto, espera confirmación del usuario. Al recoger, alcanza F y retorna a q₀.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="seccion-rutas-cortas">
+      <header>
+        <div>
+          <span>Caminos mínimos en Q</span>
+          <h2>Secuencia óptima de monedas por producto</h2>
+        </div>
+        <p>Desde q₀ se calcula la secuencia mínima de símbolos necesaria para alcanzar cada estado de aceptación.</p>
+      </header>
+      <div class="rejilla-rutas" id="tablaCaminosCortos"></div>
+    </section>
+
+    <section class="seccion-transiciones">
+      <header>
+        <div>
+          <span>Tabla de transiciones</span>
+          <h2>Función δ: Q × Σ → Q</h2>
+        </div>
+        <p>Filas = estados q ∈ Q. Columnas = símbolos σ ∈ Σ. Celdas marcadas indican estados de aceptación.</p>
+      </header>
+      <div class="scroll-transiciones">
+        <table id="tablaTransiciones"></table>
+      </div>
+    </section>
+
+    <section class="seccion-transiciones">
+      <header>
+        <div>
+          <span>Conjuntos de aceptación</span>
+          <h2>Estados de aceptación por producto</h2>
+        </div>
+        <p>Cada producto define Fᵢ ⊂ Q: → marca q₀ y ◎ marca los estados donde el producto queda habilitado.</p>
+      </header>
+      <div class="rejilla-aceptacion" id="tablasAceptacion"></div>
+    </section>
+
+    <section class="seccion-formal">
+      <header>
+        <div>
+          <span>Definición formal</span>
+          <h2>Quíntupla de la máquina expendedora</h2>
+        </div>
+      </header>
+      <dl class="lista-formal">
+        <div>
+          <dt>Q</dt>
+          <dd id="conjuntoEstados">Estados de saldo acumulado hasta crédito suficiente</dd>
+        </div>
+        <div>
+          <dt>Σ</dt>
+          <dd id="alfabetoEntrada">Monedas aceptadas</dd>
+        </div>
+        <div>
+          <dt>δ</dt>
+          <dd>Función de transición: δ(q, σ) = q' donde q' representa el nuevo saldo acumulado.</dd>
+        </div>
+        <div>
+          <dt>λ</dt>
+          <dd>Función de salida: al seleccionar producto, entrega si q ∈ F y calcula vuelto = saldo − precio.</dd>
+        </div>
+      </dl>
+    </section>
+  </main>
+
+  <div class="notificacion-flotante" id="toast" hidden></div>
+  </div>
+  <script src="app-expendedora.js"></script>
+</body>
+</html>
