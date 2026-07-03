@@ -199,6 +199,8 @@ function reiniciarCicloCompra(mensaje = "La maquina vuelve a q0 y espera dinero.
   productoEntregado = null;
   transicionActiva = null;
   limpiarSalidaVisual();
+  MotorGrafo.reiniciar();
+  AFDExpendedora.reiniciar();
   actualizarPantalla({ mensaje });
   renderDiagramaMaquina();
   renderDiagrama();
@@ -1350,6 +1352,7 @@ function insertarMoneda(moneda) {
     return;
   }
 
+  const saldoAnteriorReal = saldo;
   const estadoAnterior = estadoDesdeSaldo(saldo);
   saldo += moneda;
   transicionActiva = { estado: estadoAnterior, moneda };
@@ -1363,8 +1366,10 @@ function insertarMoneda(moneda) {
 
   actualizarPantalla({ moneda, mensaje });
   animarInsercionMoneda(moneda);
+  MotorGrafo.agregarEvento("moneda", { moneda, saldo, estadoAnterior, estadoNuevo: estadoDesdeSaldo(saldo) });
   renderDiagramaMaquina();
   renderDiagrama();
+  AFDExpendedora.registrarMoneda({ saldoAnterior: saldoAnteriorReal, moneda, saldoActual: saldo });
 }
 
 function comprarProducto(producto) {
@@ -1374,6 +1379,7 @@ function comprarProducto(producto) {
   }
 
   const vuelto = saldo - producto.precio;
+  AFDExpendedora.registrarCompra({ producto, vuelto, saldoCompra: saldo });
   productoEntregado = producto;
   estadoRecojo = "esperando";
   saldo = 0;
@@ -1390,6 +1396,7 @@ function comprarProducto(producto) {
   });
   animarEntrega(producto, vuelto);
   mostrarToast(`Salio ${producto.nombre}. Recogelo para finalizar.`);
+  MotorGrafo.agregarEvento("compra", { producto: producto.nombre, precio: producto.precio, vuelto });
   renderDiagramaMaquina();
   renderDiagrama();
   renderDiagramaRecojo();
@@ -1413,8 +1420,10 @@ function recogerProducto() {
     mensaje: `Aceptacion completada: recogiste ${nombreProducto}. Reiniciando a q0...`
   });
   mostrarToast(`Producto recogido: ${nombreProducto}.`);
+  MotorGrafo.agregarEvento("recojo", { producto: nombreProducto });
   renderDiagramaMaquina();
   renderDiagramaRecojo();
+  AFDExpendedora.registrarFinal();
 
   reinicioRecojoTimer = setTimeout(() => {
     reiniciarCicloCompra("Listo. La maquina vuelve a q0 y espera dinero.");
@@ -1431,10 +1440,12 @@ function actualizarMaquina() {
   }
 
   monedas = nuevasMonedas;
+  AFDExpendedora.configurar({ monedas, productos });
   saldo = 0;
   productoEntregado = null;
   transicionActiva = null;
   limpiarSalidaVisual();
+  MotorGrafo.reiniciar();
 
   renderBotonesMonedas();
   actualizarElementosFormales();
@@ -1454,6 +1465,8 @@ reiniciarMaquinaBtn.addEventListener("click", () => {
   productoEntregado = null;
   transicionActiva = null;
   limpiarSalidaVisual();
+  MotorGrafo.reiniciar();
+  AFDExpendedora.reiniciar();
   actualizarPantalla({ mensaje: "Compra reiniciada. La maquina vuelve a q0." });
   renderDiagramaMaquina();
   renderDiagrama();
@@ -1464,6 +1477,9 @@ window.addEventListener("resize", () => {
   renderDiagramaMaquina();
   renderDiagrama();
   renderDiagramaRecojo();
+  MotorGrafo.redibujar();
 });
 
+AFDExpendedora.init({ canvasId: 'afdCanvas', selectorId: 'afdProductoObjetivo', monedas, productos });
+MotorGrafo.init();
 actualizarMaquina();

@@ -2457,3 +2457,108 @@ td:first-child, td:nth-child(2) { width: 72px; }
   object-fit: contain;
   transition: transform 0.3s ease;
 }
+
+/* ═══ GRAFO AFD EN TIEMPO REAL ═══ */
+.panel-grafo {
+  box-shadow: 0 0 24px rgba(6, 182, 212, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+#contenedorCanvas {
+  border-radius: 12px;
+  border: 1px solid #374151;
+  background-color: #0b1120;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+  box-shadow: inset 0 0 40px rgba(6, 182, 212, 0.04);
+}
+
+#contenedorCanvas::-webkit-scrollbar {
+  height: 8px;
+}
+
+#contenedorCanvas::-webkit-scrollbar-track {
+  background: #111827;
+  border-radius: 4px;
+}
+
+#contenedorCanvas::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 4px;
+}
+
+#contenedorCanvas::-webkit-scrollbar-thumb:hover {
+  background: #06b6d4;
+}
+
+#lienzoGrafo {
+  display: block;
+  height: 350px;
+  cursor: default;
+}
+
+/* AFD oscuro tipo ejemplo */
+.tarjeta-afd-producto {
+  background: #0b1220 !important;
+  border-color: #1f3a4d !important;
+  min-height: calc(100vh - 36px) !important;
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+  overflow: hidden !important;
+}
+
+.tarjeta-afd-producto header {
+  padding: 20px 24px !important;
+  align-items: center !important;
+  background: #111827 !important;
+  border-bottom: 1px solid #1f3a4d !important;
+}
+
+.tarjeta-afd-producto h2 {
+  color: #e2e8f0 !important;
+  font-size: clamp(24px, 3vw, 34px) !important;
+}
+
+.tarjeta-afd-producto header span {
+  color: #38bdf8 !important;
+}
+
+.selector-afd {
+  display: grid !important;
+  gap: 5px !important;
+  min-width: min(320px, 100%) !important;
+  color: #94a3b8 !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: .04em !important;
+  text-transform: uppercase !important;
+}
+
+.selector-afd select {
+  width: 100% !important;
+  min-height: 44px !important;
+  border: 1px solid #334155 !important;
+  border-radius: 7px !important;
+  padding: 0 10px !important;
+  color: #e2e8f0 !important;
+  background: #0f172a !important;
+  font: inherit !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+.tarjeta-afd-producto .lienzo-scroll,
+.lienzo-afd {
+  height: calc(100vh - 150px) !important;
+  min-height: 760px !important;
+  overflow: auto !important;
+  background: #08111f !important;
+}
+
+#afdCanvas {
+  min-width: 1680px !important;
+  display: block !important;
+}
